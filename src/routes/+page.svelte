@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import '../app.css';
-  import Countdown from '$lib/components/Countdown.svelte';
-  import EventCard from '$lib/components/EventCard.svelte';
   import TodaySchedule from '$lib/components/TodaySchedule.svelte';
   import type { PageData } from './$types';
   import { calculateCountdown, pad, formatDate } from '$lib/utils/countdown';
@@ -247,22 +244,14 @@
 
     {#if error}
       <div class="error-banner anim-rise">
-        <span aria-hidden="true">⚠</span>
+        <span aria-hidden="true">ℹ</span>
         <div>
-          <strong>Calendar Unavailable</strong>
           <p>{error}</p>
         </div>
       </div>
     {/if}
 
-    {#if !calendar && !error}
-      <div class="loading">
-        <div class="loading-ring"></div>
-        <span>Loading calendar…</span>
-      </div>
-    {/if}
-
-    {#if calendar && phase !== 'celebrating'}
+    {#if phase !== 'celebrating'}
       <!-- ─── HERO ─────────────────────────────────────── -->
       {#if activeTarget}
         <section class="hero anim-rise" data-urgency={urgency}>
@@ -322,7 +311,7 @@
             </div>
 
             <!-- School days strip -->
-            {#if calendar.schoolDaysRemaining > 0 && phase === 'countdown'}
+            {#if calendar?.schoolDaysRemaining > 0 && phase === 'countdown'}
               <div class="days-strip anim-rise delay-4">
                 <span class="strip-diamond" aria-hidden="true">◆</span>
                 <strong class="strip-count">{calendar.schoolDaysRemaining}</strong>
@@ -335,48 +324,19 @@
       {/if}
 
       <!-- ─── Today's bell schedule ───────────────────── -->
-      {#if calendar.todaySchedule && phase === 'countdown'}
+      {#if calendar?.todaySchedule && phase === 'countdown'}
         <section class="section anim-rise delay-5">
           <h2 class="section-heading"><span>Today's Bell Schedule</span></h2>
           <TodaySchedule schedule={calendar.todaySchedule} />
         </section>
       {/if}
 
-      <!-- ─── Secondary countdowns ───────────────────── -->
-      {#if calendar.lastDayOfSchool && phase === 'countdown'}
-        {@const secondary = calendar.events
-          .filter(e => e.id !== calendar.lastDayOfSchool!.id)
-          .slice(0, 3)}
-        {#if secondary.length > 0}
-          <section class="section anim-rise delay-6">
-            <h2 class="section-heading"><span>Upcoming Countdowns</span></h2>
-            <div class="card-grid">
-              {#each secondary as event (event.id)}
-                <Countdown targetDate={event.start} label={event.summary} />
-              {/each}
-            </div>
-          </section>
-        {/if}
+      {#if calendar}
+        <p class="fetch-note">
+          Updated {calendar.fetchedAt.toLocaleTimeString()} ·
+          <button class="refresh-btn" onclick={() => location.reload()}>refresh</button>
+        </p>
       {/if}
-
-      <!-- ─── Events list ──────────────────────────────── -->
-      {#if calendar.events.length > 0}
-        <section class="section anim-rise delay-7">
-          <h2 class="section-heading"><span>School Calendar</span></h2>
-          <div class="events-list">
-            {#each calendar.events as event (event.id)}
-              <EventCard {event} />
-            {/each}
-          </div>
-        </section>
-      {:else}
-        <div class="empty">No upcoming events found in the next 60 days.</div>
-      {/if}
-
-      <p class="fetch-note">
-        Updated {calendar.fetchedAt.toLocaleTimeString()} ·
-        <button class="refresh-btn" onclick={() => location.reload()}>refresh</button>
-      </p>
     {/if}
 
   </div>
@@ -385,10 +345,8 @@
 <footer class="site-footer">
   <div class="container footer-row">
     <p>
-      Calendar via
+      Data via
       <a href="https://phs.psdr3.org" target="_blank" rel="noopener">PHS Calendar</a>
-      &amp;
-      <a href="https://calendar.google.com" target="_blank" rel="noopener">Google Calendar</a>
     </p>
   </div>
 </footer>
@@ -793,8 +751,6 @@
   .delay-3 { animation-delay: 0.4s; }
   .delay-4 { animation-delay: 0.6s; }
   .delay-5 { animation-delay: 0.8s; }
-  .delay-6 { animation-delay: 1s;   }
-  .delay-7 { animation-delay: 1.2s; }
   @keyframes rise {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -825,57 +781,23 @@
     background: var(--rule);
   }
   .section-heading span { white-space: nowrap; }
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
-  }
-  .events-list { display: flex; flex-direction: column; }
 
   /* ─── States ──────────────────────────────────────────── */
-  .loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 6rem 1rem;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-  }
-  .loading-ring {
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 2px solid var(--rule);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
   .error-banner {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    background: rgba(192, 57, 43, 0.07);
-    border: 1px solid rgba(192, 57, 43, 0.25);
+    background: rgba(200, 146, 42, 0.06);
+    border: 1px solid rgba(200, 146, 42, 0.2);
     border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    margin: 2rem 0;
+    padding: 0.75rem 1.25rem;
+    margin: 1.5rem 0;
     font-family: var(--font-serif);
-    color: var(--cream);
-  }
-  .error-banner strong { color: #e74c3c; display: block; margin-bottom: 0.2rem; }
-  .error-banner p { font-size: 0.875rem; color: var(--muted); }
-
-  .empty {
-    text-align: center;
-    padding: 3rem 1rem;
     color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
+  .error-banner p { color: var(--muted); }
+
   .fetch-note {
     text-align: right;
     font-family: var(--font-mono);

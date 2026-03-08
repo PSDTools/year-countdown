@@ -7,6 +7,18 @@ const BELL_SCHEDULE_URL =
 
 const CORS_PROXY = 'https://corsproxy.io/?url=';
 
+/** Hardcoded fallback: last day of school for Pattonville High School 2025–2026 */
+function getLastDayFallback(): import('$lib/types').CalendarEvent {
+  const d = new Date(2026, 4, 22, 14, 18, 0, 0); // May 22 2026, 2:18 PM (end of school)
+  return {
+    id: 'last-day-fallback',
+    summary: 'Last Day for Students',
+    start: d,
+    end: d,
+    allDay: true,
+  };
+}
+
 async function fetchCalendar(url: string): Promise<string | null> {
   // Try direct fetch first
   try {
@@ -41,10 +53,6 @@ export async function load(): Promise<{ calendar: CalendarData | null; error: st
     const mainText = mainIcs.status === 'fulfilled' ? mainIcs.value : null;
     const bellText = bellIcs.status === 'fulfilled' ? bellIcs.value : null;
 
-    if (!mainText && !bellText) {
-      return { calendar: null, error: 'Unable to fetch calendar data. Please check your connection.' };
-    }
-
     const mainEvents = mainText ? futureEvents(parseICS(mainText)) : [];
     const bellEvents = bellText ? parseICS(bellText) : [];
 
@@ -62,30 +70,37 @@ export async function load(): Promise<{ calendar: CalendarData | null; error: st
       }
     }
 
+    // Final fallback: hardcoded last day of school
+    if (!lastDay) {
+      lastDay = getLastDayFallback();
+    }
+
     const schoolDaysRemaining = countSchoolDaysRemaining(
       bellEvents,
       lastDay ? lastDay.end : null
     );
 
-    // Show only upcoming events (next 60 days) from main calendar
-    const now = new Date();
-    const cutoff = new Date(now);
-    cutoff.setDate(cutoff.getDate() + 60);
-
-    const upcomingEvents = mainEvents.filter((e) => e.start <= cutoff).slice(0, 20);
-
     return {
       calendar: {
-        events: upcomingEvents,
+        events: [],
         lastDayOfSchool: lastDay,
         schoolDaysRemaining,
         todaySchedule: getTodaySchedule(bellEvents),
         fetchedAt: new Date()
       },
-      error: null
+      error: !mainText && !bellText ? 'Unable to fetch live calendar data — showing estimated last day.' : null
     };
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown error';
-    return { calendar: null, error: `Failed to load calendar data: ${message}` };
+    return {
+      calendar: {
+        events: [],
+        lastDayOfSchool: getLastDayFallback(),
+        schoolDaysRemaining: 0, // unknown without bell schedule data
+        todaySchedule: null,
+        fetchedAt: new Date()
+      },
+      error: `Using estimated last day (could not load live data: ${message})`
+    };
   }
 }
