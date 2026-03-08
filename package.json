@@ -1,36 +1,30 @@
 {
-  "name": "countdown",
+  "name": "year-countdown",
   "version": "1.0.0",
-  "description": "A countdown calendar.",
+  "description": "A SvelteKit countdown app for tracking school events and remaining school days.",
   "repository": {
     "type": "git",
     "url": "github:PSDTools/year-countdown"
   },
-  "markdown": "github",
-  "type": "module",
-  "exports": "./index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": {
-    "name": "Parker Hasenkamp"
-  },
-  "readme": "README.md",
-  "contributors": [
-    {
-      "name": "Eli",
-      "email": "88557639+lishaduck@users.noreply.github.com"
-    }
-  ],
-  "dependencies": {
-    "express": "^4.18.2",
-    "ical.js": "^1.5.0",
-    "node-fetch": "^3.3.1",
-    "socket.io": "^4.6.1"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^20.2.1",
-    "typescript": "^5.0.4"
-  }
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.1.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "ical.js": "^2.1.0"
+  },
+  "type": "module"
 }

@@ -1,27 +1,39 @@
-<!DOCTYPE html>
-<html lang="en-US">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Countdown!</title>
+    <link rel="icon" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="./_app/immutable/entry/start.qqnQlbdC.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/CoCjPWJw.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/C9l1F03v.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BumdHySg.js" rel="modulepreload">
+		<link href="./_app/immutable/entry/app.BNOh3rkF.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/D1WECQzN.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DhDXNBpt.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/BM3yWKy-.js" rel="modulepreload">
+		<link href="./_app/immutable/chunks/DGNFubKc.js" rel="modulepreload">
+		
   </head>
-  <body onload="load()">
-    <p>There are <span id="countdown">Offline</span> Days Left of School</p>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">
+			<script>
+				{
+					__sveltekit_1m5qj06 = {
+						base: new URL(".", location).pathname.slice(0, -1),
+						assets: "/year-countdown"
+					};
 
-    <script type="module">
-      "use strict";
-      import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-      const socket = io();
+					const element = document.currentScript.parentElement;
 
-      socket.on("eoty", function (msg) {
-        document.getElementById("countdown").innerHTML = msg;
-      });
-
-      function load() {
-        socket.emit("needLD");
-        // console.log("emited");
-      }
-      window.load = load;
-    </script>
+					Promise.all([
+						import("./_app/immutable/entry/start.qqnQlbdC.js"),
+						import("./_app/immutable/entry/app.BNOh3rkF.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
   </body>
 </html>
