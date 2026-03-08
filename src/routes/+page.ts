@@ -28,7 +28,7 @@ async function fetchCalendar(url: string): Promise<string | null> {
   return null;
 }
 
-export const prerender = false;
+export const prerender = true;
 export const ssr = false;
 
 export async function load(): Promise<{ calendar: CalendarData | null; error: string | null }> {
