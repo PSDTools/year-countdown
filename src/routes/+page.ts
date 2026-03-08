@@ -1,4 +1,4 @@
-import { parseICS, futureEvents, findLastDayOfSchool, countSchoolDaysRemaining, isAttendanceDay } from '$lib/utils/ical';
+import { parseICS, futureEvents, findLastDayOfSchool, countSchoolDaysRemaining, isAttendanceDay, getTodaySchedule } from '$lib/utils/ical';
 import type { CalendarData } from '$lib/types';
 
 const MAIN_CALENDAR_URL = 'https://phs.psdr3.org/calendar/calendar_362.ics';
@@ -79,6 +79,7 @@ export async function load(): Promise<{ calendar: CalendarData | null; error: st
         events: upcomingEvents,
         lastDayOfSchool: lastDay,
         schoolDaysRemaining,
+        todaySchedule: getTodaySchedule(bellEvents),
         fetchedAt: new Date()
       },
       error: null

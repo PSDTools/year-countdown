@@ -3,6 +3,7 @@
   import '../app.css';
   import Countdown from '$lib/components/Countdown.svelte';
   import EventCard from '$lib/components/EventCard.svelte';
+  import TodaySchedule from '$lib/components/TodaySchedule.svelte';
   import type { PageData } from './$types';
   import { calculateCountdown, pad, formatDate } from '$lib/utils/countdown';
   import type { CountdownData, CalendarEvent } from '$lib/types';
@@ -333,13 +334,21 @@
         </section>
       {/if}
 
+      <!-- ─── Today's bell schedule ───────────────────── -->
+      {#if calendar.todaySchedule && phase === 'countdown'}
+        <section class="section anim-rise delay-5">
+          <h2 class="section-heading"><span>Today's Bell Schedule</span></h2>
+          <TodaySchedule schedule={calendar.todaySchedule} />
+        </section>
+      {/if}
+
       <!-- ─── Secondary countdowns ───────────────────── -->
       {#if calendar.lastDayOfSchool && phase === 'countdown'}
         {@const secondary = calendar.events
           .filter(e => e.id !== calendar.lastDayOfSchool!.id)
           .slice(0, 3)}
         {#if secondary.length > 0}
-          <section class="section anim-rise delay-5">
+          <section class="section anim-rise delay-6">
             <h2 class="section-heading"><span>Upcoming Countdowns</span></h2>
             <div class="card-grid">
               {#each secondary as event (event.id)}
@@ -352,7 +361,7 @@
 
       <!-- ─── Events list ──────────────────────────────── -->
       {#if calendar.events.length > 0}
-        <section class="section anim-rise delay-6">
+        <section class="section anim-rise delay-7">
           <h2 class="section-heading"><span>School Calendar</span></h2>
           <div class="events-list">
             {#each calendar.events as event (event.id)}
@@ -785,6 +794,7 @@
   .delay-4 { animation-delay: 0.6s; }
   .delay-5 { animation-delay: 0.8s; }
   .delay-6 { animation-delay: 1s;   }
+  .delay-7 { animation-delay: 1.2s; }
   @keyframes rise {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
