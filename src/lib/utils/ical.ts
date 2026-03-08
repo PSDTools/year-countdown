@@ -82,7 +82,7 @@ export function findLastDayOfSchool(events: CalendarEvent[]): CalendarEvent | nu
     'end of school year',
     'end of school',
     'school ends',
-    'last day'
+    'last day'          // broad catch-all; placed last to avoid false matches
   ];
   const now = new Date();
 

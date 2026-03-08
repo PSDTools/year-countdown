@@ -1,21 +1,23 @@
 :root {
-  --primary: #1a237e;
-  --primary-light: #3949ab;
-  --primary-dark: #0d1b6e;
-  --accent: #f57c00;
-  --accent-light: #ffb74d;
-  --background: #f5f5f5;
-  --surface: #ffffff;
-  --text: #212121;
-  --text-secondary: #757575;
-  --border: #e0e0e0;
-  --success: #2e7d32;
-  --warning: #e65100;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.18);
-  --radius: 12px;
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-size-small: 0.78rem;
+  --bg: #08080c;
+  --surface: #0f0f17;
+  --surface-hover: #16161f;
+  --gold: #c8922a;
+  --gold-light: #e8b14e;
+  --gold-bright: #ffd166;
+  --gold-dim: rgba(200, 146, 42, 0.10);
+  --cream: #f2ede4;
+  --muted: #6b6460;
+  --rule: #1c1c28;
+  --urgent: #e05530;
+  --success: #4ecb71;
+
+  --font-display: 'Bebas Neue', 'Impact', sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+
+  --container: 1080px;
+  --radius: 3px;
 }
 
 *, *::before, *::after {
@@ -26,32 +28,54 @@
 
 html {
   font-size: 16px;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font);
-  background: var(--background);
-  color: var(--text);
+  font-family: var(--font-serif);
+  background-color: var(--bg);
+  color: var(--cream);
   min-height: 100vh;
   line-height: 1.6;
+  overflow-x: hidden;
+  /* Subtle dot-grid texture */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: fixed;
 }
 
-h1, h2, h3, h4 {
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-a {
-  color: var(--primary-light);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+/* Warm amber radial glow at the top */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 120% 55% at 50% -10%,
+    rgba(200, 146, 42, 0.07) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--gold-light);
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  line-height: 1.15;
 }
