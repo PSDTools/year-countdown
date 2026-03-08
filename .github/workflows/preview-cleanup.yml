@@ -15,7 +15,10 @@ jobs:
         id: branch
         run: |
           BRANCH="${{ github.head_ref }}"
-          SANITIZED=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/-\+/-/g' | sed 's/^-//;s/-$//')
+          SANITIZED=$(echo "$BRANCH" \
+            | sed 's/[^a-zA-Z0-9-]/-/g' \
+            | sed 's/-\+/-/g' \
+            | sed 's/^-//;s/-$//')
           echo "name=$SANITIZED" >> "$GITHUB_OUTPUT"
 
       - name: Checkout gh-pages branch

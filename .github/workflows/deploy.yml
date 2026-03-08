@@ -21,6 +21,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve deploy target
+        id: target
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "main" ]; then
+            echo "base=/year-countdown" >> "$GITHUB_OUTPUT"
+            echo "folder=." >> "$GITHUB_OUTPUT"
+          else
+            SLUG=$(echo "$BRANCH" \
+              | sed 's/[^a-zA-Z0-9-]/-/g' \
+              | sed 's/-\+/-/g' \
+              | sed 's/^-//;s/-$//')
+            echo "base=/year-countdown/previews/$SLUG" >> "$GITHUB_OUTPUT"
+            echo "folder=previews/$SLUG" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -33,11 +49,12 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          BASE_PATH: /year-countdown
+          BASE_PATH: ${{ steps.target.outputs.base }}
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: build
+          target-folder: ${{ steps.target.outputs.folder }}
           # Don't wipe out PR preview subdirectories on each main deploy
           clean-exclude: previews/
