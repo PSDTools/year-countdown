@@ -44,6 +44,11 @@
     return 'normal';
   })());
 
+  // ── School days: attendance-based when available, else calendar days ──
+  const schoolDays = $derived(calendar?.schoolDaysRemaining ?? 0);
+  const daysDisplay = $derived(schoolDays > 0 ? schoolDays : heroCountdown.days);
+  const daysLabel   = $derived(schoolDays > 0 ? 'School Days' : 'Calendar Days');
+
   // ── Countdown interval ─────────────────────────────────
   $effect(() => {
     const lastDay = activeTarget;
@@ -275,11 +280,11 @@
               <!-- Dominant DAYS block -->
               <div class="days-block">
                 <div class="days-digit-wrap" class:tremble={urgency === 'critical'}>
-                  {#key heroCountdown.days}
-                    <span class="digit-days flip-big">{heroCountdown.days}</span>
+                  {#key daysDisplay}
+                    <span class="digit-days flip-big">{daysDisplay}</span>
                   {/key}
                 </div>
-                <span class="unit-lbl">Days</span>
+                <span class="unit-lbl">{daysLabel}</span>
               </div>
 
               <!-- Vertical rule separator -->
@@ -309,16 +314,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- School days strip -->
-            {#if calendar?.schoolDaysRemaining > 0 && phase === 'countdown'}
-              <div class="days-strip anim-rise delay-4">
-                <span class="strip-diamond" aria-hidden="true">◆</span>
-                <strong class="strip-count">{calendar.schoolDaysRemaining}</strong>
-                <span class="strip-label">attendance days remaining</span>
-                <span class="strip-diamond" aria-hidden="true">◆</span>
-              </div>
-            {/if}
           {/if}
         </section>
       {/if}
@@ -689,37 +684,6 @@
     50%       { text-shadow: 0 0 140px rgba(224,85,48,0.85), 0 0 50px rgba(224,85,48,0.45), 0 4px 20px rgba(0,0,0,0.5); }
   }
 
-  /* School days strip */
-  .days-strip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 0.55rem 1.75rem;
-    border: 1px solid rgba(200, 146, 42, 0.2);
-    border-radius: 2px;
-    background: rgba(200, 146, 42, 0.04);
-    animation: stripPulse 3s ease-in-out infinite;
-  }
-  @keyframes stripPulse {
-    0%, 100% { box-shadow: 0 0 0   rgba(200,146,42,0); }
-    50%       { box-shadow: 0 0 18px rgba(200,146,42,0.18); }
-  }
-  .strip-diamond { color: var(--gold); font-size: 0.45rem; opacity: 0.7; }
-  .strip-count {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    color: var(--cream);
-    line-height: 1;
-    letter-spacing: 0.05em;
-  }
-  .strip-label {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
   .countdown-past {
     font-family: var(--font-serif);
     font-size: clamp(2rem, 6vw, 4rem);
@@ -749,7 +713,6 @@
   .anim-rise { animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .delay-2 { animation-delay: 0.2s; }
   .delay-3 { animation-delay: 0.4s; }
-  .delay-4 { animation-delay: 0.6s; }
   .delay-5 { animation-delay: 0.8s; }
   @keyframes rise {
     from { opacity: 0; transform: translateY(14px); }
