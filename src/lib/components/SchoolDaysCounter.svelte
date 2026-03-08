@@ -56,7 +56,7 @@
   }
 
   .school-days-note {
-    font-size: 0.78rem;
+    font-size: var(--font-size-small);
     opacity: 0.7;
     margin-top: 0.15rem;
   }

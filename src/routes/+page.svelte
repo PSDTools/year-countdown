@@ -247,7 +247,7 @@
   }
 
   .fetch-note {
-    font-size: 0.78rem;
+    font-size: var(--font-size-small);
     color: var(--text-secondary);
     text-align: right;
     margin-top: 1rem;

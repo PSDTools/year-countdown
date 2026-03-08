@@ -155,7 +155,7 @@
   }
 
   .event-location {
-    font-size: 0.78rem;
+    font-size: var(--font-size-small);
     color: var(--text-secondary);
     margin-top: 0.25rem;
   }

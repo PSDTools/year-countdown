@@ -15,6 +15,7 @@
   --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.18);
   --radius: 12px;
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-size-small: 0.78rem;
 }
 
 *, *::before, *::after {
