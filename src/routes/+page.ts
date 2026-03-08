@@ -1,4 +1,4 @@
-import { parseICS, futureEvents, findLastDayOfSchool, countSchoolDaysRemaining } from '$lib/utils/ical';
+import { parseICS, futureEvents, findLastDayOfSchool, countSchoolDaysRemaining, isAttendanceDay } from '$lib/utils/ical';
 import type { CalendarData } from '$lib/types';
 
 const MAIN_CALENDAR_URL = 'https://phs.psdr3.org/calendar/calendar_362.ics';
@@ -48,7 +48,20 @@ export async function load(): Promise<{ calendar: CalendarData | null; error: st
     const mainEvents = mainText ? futureEvents(parseICS(mainText)) : [];
     const bellEvents = bellText ? parseICS(bellText) : [];
 
-    const lastDay = findLastDayOfSchool(mainEvents);
+    let lastDay = findLastDayOfSchool(mainEvents);
+
+    // Fallback: if the main calendar has no "last day" event, use the latest
+    // attendance day from the bell schedule as the end-of-school countdown target.
+    if (!lastDay && bellEvents.length > 0) {
+      const now = new Date();
+      const attendanceDays = bellEvents
+        .filter((e) => isAttendanceDay(e) && e.start >= now)
+        .sort((a, b) => b.start.getTime() - a.start.getTime());
+      if (attendanceDays.length > 0) {
+        lastDay = { ...attendanceDays[0], summary: 'Last Day for Students' };
+      }
+    }
+
     const schoolDaysRemaining = countSchoolDaysRemaining(
       bellEvents,
       lastDay ? lastDay.end : null

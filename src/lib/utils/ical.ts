@@ -62,11 +62,28 @@ export function futureEvents(events: CalendarEvent[], from: Date = new Date()): 
 }
 
 /**
+ * Returns true when the event represents an actual attendance day.
+ * Bell-schedule events whose summary contains "no school" (case-insensitive)
+ * are holidays/breaks and should not be counted.
+ */
+export function isAttendanceDay(event: CalendarEvent): boolean {
+  return !event.summary.toLowerCase().includes('no school');
+}
+
+/**
  * Find the "Last Day of School" event from events list.
  * Looks for common keywords in the summary.
  */
 export function findLastDayOfSchool(events: CalendarEvent[]): CalendarEvent | null {
-  const keywords = ['last day', 'last day of school', 'last day for students', 'end of school'];
+  const keywords = [
+    'last day for students',
+    'last day of school',
+    'last day of classes',
+    'end of school year',
+    'end of school',
+    'school ends',
+    'last day'
+  ];
   const now = new Date();
 
   const matches = events
@@ -82,7 +99,8 @@ export function findLastDayOfSchool(events: CalendarEvent[]): CalendarEvent | nu
 /**
  * Count the number of actual school days remaining by looking at
  * the bell schedule calendar events. Each unique date in the bell
- * schedule calendar represents a school day.
+ * schedule calendar represents a school day. Events with "no school"
+ * in the summary (e.g. holidays, breaks) are excluded.
  */
 export function countSchoolDaysRemaining(
   bellScheduleEvents: CalendarEvent[],
@@ -97,9 +115,11 @@ export function countSchoolDaysRemaining(
     cutoff.setHours(23, 59, 59, 999);
   }
 
-  // Collect unique dates from bell schedule events
+  // Collect unique dates from bell schedule events, excluding "No School" days
   const schoolDates = new Set<string>();
   for (const event of bellScheduleEvents) {
+    if (!isAttendanceDay(event)) continue;
+
     const d = new Date(event.start);
     d.setHours(0, 0, 0, 0);
 

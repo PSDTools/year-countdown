@@ -13,7 +13,7 @@
 
   const calendar = $derived(data.calendar);
   const error = $derived(data.error);
-  const schoolName = 'Parkway High School';
+  const schoolName = 'Pattonville High School';
   const currentYear = new Date().getFullYear();
 </script>
 

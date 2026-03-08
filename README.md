@@ -1,6 +1,6 @@
 # Year Countdown
 
-A SvelteKit application that tracks school events and remaining school days by integrating with two ICS calendars from Parkway High School.
+A SvelteKit application that tracks school events and remaining school days by integrating with two ICS calendars from Pattonville High School.
 
 ## Features
 
