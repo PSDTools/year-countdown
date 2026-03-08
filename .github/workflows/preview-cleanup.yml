@@ -1,0 +1,39 @@
+name: Remove PR Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get sanitized branch name
+        id: branch
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          SANITIZED=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/-\+/-/g' | sed 's/^-//;s/-$//')
+          echo "name=$SANITIZED" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout gh-pages branch
+        id: checkout
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Remove preview directory
+        if: steps.checkout.outcome == 'success'
+        run: |
+          if [ -d "previews/${{ steps.branch.outputs.name }}" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git rm -rf "previews/${{ steps.branch.outputs.name }}"
+            git commit -m "Remove preview for ${{ steps.branch.outputs.name }}"
+            git push
+          else
+            echo "Preview directory 'previews/${{ steps.branch.outputs.name }}' not found — nothing to clean up."
+          fi
