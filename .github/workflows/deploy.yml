@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - main
+      - copilot/**
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write  # for JamesIves to push to gh-pages branch
+  pages: write     # for Pages API to configure the deployment source
 
 # Allow only one concurrent deployment, cancelling any in-progress run
 concurrency:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,18 +37,26 @@ jobs:
         env:
           BASE_PATH: /year-countdown
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: build
+          branch: gh-pages
+          folder: build
+          clean: true
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Configure Pages source to gh-pages branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          STATUS=$(curl -s -o response.json -w "%{http_code}" -X PUT \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/pages" \
+            -d '{"build_type":"legacy","source":{"branch":"gh-pages","path":"/"}}')
+          if echo "$STATUS" | grep -qE '^2'; then
+            echo "Pages source configured to gh-pages branch (HTTP $STATUS)"
+          else
+            echo "Warning: Pages API returned HTTP $STATUS — manual configuration may be needed"
+            cat response.json || true
+          fi
